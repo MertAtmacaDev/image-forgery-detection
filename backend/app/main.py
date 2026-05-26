@@ -32,5 +32,5 @@ async def upload_image(file: UploadFile = File(...)):
         "filename": file.filename,
         "content_type": file.content_type,
         "size": os.path.getsize(file_path),
-        "unique_ filename": unique_filename
+        "unique_filename": unique_filename
     }
