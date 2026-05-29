@@ -1,4 +1,8 @@
 fastapi
-uvicorn 
-opencv-contrib-python 
+uvicorn
+opencv-contrib-python
 python-multipart
+torch
+torchvision
+numpy
+pillow
