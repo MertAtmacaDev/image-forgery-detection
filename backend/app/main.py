@@ -30,7 +30,7 @@ async def upload_image(file: UploadFile = File(...)):
     extension = file.filename.split(".")[-1].lower()
 
     if extension not in allowed_extensions:
-        raise HTTPException(status_code=400, detail="Geçersiz dosya uzantısı.")
+        raise HTTPException(status_code=400, detail="invalid.")
     
     unique_filename = f"{uuid.uuid4()}.{extension}"
     file_path = os.path.join(UPLOAD_DIR, unique_filename)

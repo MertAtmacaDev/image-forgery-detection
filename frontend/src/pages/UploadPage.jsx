@@ -15,35 +15,26 @@ export default function UploadPage() {
 
     setLoading(true);
     try {
-      // Step 1: Upload image to secure storage
       setLoadingMessage("Uploading image to secure server...");
       const uniqueFilename = await uploadImage(file);
 
-      // Step 2: Trigger SIFT, ORB, AKAZE, BRISK
       setLoadingMessage("Running Classical Computer Vision algorithms (SIFT, ORB...)...");
       const classicalData = await analyzeClassical(uniqueFilename);
 
-      // Step 3: Trigger Neural Networks (ResNet18 & CNN-LSTM Hybrid)
       setLoadingMessage("Invoking Deep Learning models and Error Level Analysis (ELA)...");
       const aiData = await analyzeAI(uniqueFilename);
 
-      // --- KONSENSÜS OYLAMA SİSTEMİ (ENSEMBLE VOTING) ---
-      // 1. Klasik algoritmalardan gelen şüpheli oyları say (Maks: 4)
       const classicalFakeVotes = Object.keys(classicalData).filter(
         (key) => classicalData[key].is_forged
       ).length;
 
-      // 2. Yapay zeka modellerinden gelen şüpheli oyları say (Maks: 2)
       const resnetFakeVote = aiData.resnet18_prediction?.prediction === "tampered" ? 1 : 0;
       const cnnLstmFakeVote = aiData.cnn_lstm_prediction?.prediction === "tampered" ? 1 : 0;
 
-      // 3. Toplam şüpheli oy sayısı (Maks: 6)
       const totalFakeVotes = classicalFakeVotes + resnetFakeVote + cnnLstmFakeVote;
 
-      // 4. Oy çokluğu kararı (6 yöntemden en az 3 tanesi sahte diyorsa alarm ver)
       const overallVerdict = totalFakeVotes >= 3 ? "Suspicious" : "Clean";
 
-      // --- LOCAL STORAGE LOGGING (History Page İçin Kayıt) ---
       const newLog = {
         id: Date.now(),
         date: new Date().toLocaleString(),
@@ -53,12 +44,10 @@ export default function UploadPage() {
       const existingHistory = JSON.parse(localStorage.getItem('forgery_history') || '[]');
       localStorage.setItem('forgery_history', JSON.stringify([newLog, ...existingHistory]));
 
-      // --- LATEST ANALYSIS CACHE (Navbar'dan Tıklanınca Veri Kaybolmasın Diye) ---
       const previewUrl = URL.createObjectURL(file);
       const latestAnalysisPayload = { classicalData, aiData, previewUrl };
       localStorage.setItem('latest_analysis', JSON.stringify(latestAnalysisPayload));
 
-      // Step 5: Route smoothly to Results view
       navigate('/results', { state: latestAnalysisPayload });
 
     } catch (error) {

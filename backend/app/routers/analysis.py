@@ -18,7 +18,7 @@ async def analyze_image(filename: str):
     if not os.path.exists(file_path):
         raise HTTPException(
             status_code=404, 
-            detail=f"Görsel bulunamadı. Aranan konum: {file_path}"
+            detail=f"image not found. path: {file_path}"
         )
     
     try:
@@ -36,7 +36,7 @@ async def analyze_image(filename: str):
             
             success, encoded_image = cv2.imencode('.jpg', res["result_image"])#image to base64
             if not success:
-                raise Exception(f"{name} görseli encode edilemedi.")
+                raise Exception(f"{name} image does not encoding.")
             
             base64_str = base64.b64encode(encoded_image).decode('utf-8')
             full_base64_uri = f"data:image/jpeg;base64,{base64_str}"
@@ -53,5 +53,5 @@ async def analyze_image(filename: str):
     except Exception as e:
         raise HTTPException(
             status_code=500, 
-            detail=f"Analiz sırasında sunucu hatası oluştu: {str(e)}"
+            detail=f"server error: {str(e)}"
         )

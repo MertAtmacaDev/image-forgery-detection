@@ -5,12 +5,10 @@ import AiResultCard from '../components/AiResultCard';
 export default function ResultsPage() {
   const location = useLocation();
 
-  // 1. Önce kargo paketinden (state) gelen anlık verileri almayı dene
   let classicalData = location.state?.classicalData;
   let aiData = location.state?.aiData;
   let previewUrl = location.state?.previewUrl;
 
-  // 2. Eğer Navbar'dan direkt tıklandıysa ve state boşsa, localStorage hafızasından son analizi çek
   if (!classicalData || !aiData) {
     const savedAnalysis = JSON.parse(localStorage.getItem('latest_analysis') || '{}');
     classicalData = savedAnalysis.classicalData;
@@ -18,7 +16,6 @@ export default function ResultsPage() {
     previewUrl = savedAnalysis.previewUrl;
   }
 
-  // Koruma Kalkanı: Eğer ne anlık ne de geçmişe dair hiçbir veri yoksa uyarı göster
   if (!classicalData || !aiData) {
     return (
       <div className="text-center py-12 space-y-4">
@@ -32,14 +29,12 @@ export default function ResultsPage() {
     );
   }
 
-  // --- KONSENSÜS OYLAMA HESAPLAMASI (ENSEMBLE VOTING) ---
   const classicalKeys = Object.keys(classicalData);
   const totalClassicalDetected = classicalKeys.filter(key => classicalData[key].is_forged).length;
 
   const resnetVote = aiData.resnet18_prediction?.prediction === "tampered" ? 1 : 0;
   const cnnLstmVote = aiData.cnn_lstm_prediction?.prediction === "tampered" ? 1 : 0;
   
-  // Toplam 6 Algoritmanın Ortak Karar Mekanizması
   const totalSystemVotes = totalClassicalDetected + resnetVote + cnnLstmVote;
   const finalSystemVerdict = totalSystemVotes >= 3 ? "SUSPICIOUS" : "CLEAN";
 
@@ -99,7 +94,7 @@ export default function ResultsPage() {
                 keypointCount={algo.keypoint_count}
                 matchCount={algo.match_count}
                 isForged={algo.is_forged}
-                resultImage={algo.result_image_base64} // Doğrudan ham backend kelimesi
+                resultImage={algo.result_image_base64}
               />
             );
           })}
